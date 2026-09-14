@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nodelay — Real-time, without the wait</title>
+  <meta name="description" content="Nodelay delivers real-time sync and sub-millisecond response times, so your product never makes people wait." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#top" class="logo">
+        <span class="logo-mark">⚡</span>
+        <span>Nodelay</span>
+      </a>
+
+      <nav class="nav" id="nav">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="#pricing" class="btn btn-ghost">Sign in</a>
+        <a href="#cta" class="btn btn-primary">Get started</a>
+      </div>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileNav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="mobile-nav" id="mobileNav">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="#cta" class="btn btn-primary">Get started</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <span class="eyebrow">⚡ Now serving sub‑10ms globally</span>
+        <h1>Real‑time, <span class="text-gradient">without the wait.</span></h1>
+        <p class="hero-sub">
+          Nodelay is the infrastructure layer for instant sync, live updates, and
+          zero-lag collaboration — so your users never sit there watching a spinner.
+        </p>
+
+        <form class="hero-form" id="heroForm">
+          <input type="email" id="heroEmail" placeholder="you@company.com" aria-label="Email address" required />
+          <button type="submit" class="btn btn-primary">Start free</button>
+        </form>
+        <p class="hero-note" id="heroNote">No credit card required · Free for your first 10k events/mo</p>
+
+        <div class="hero-stats">
+          <div class="stat">
+            <strong>&lt;10ms</strong>
+            <span>median latency</span>
+          </div>
+          <div class="stat">
+            <strong>99.99%</strong>
+            <span>uptime SLA</span>
+          </div>
+          <div class="stat">
+            <strong>30+</strong>
+            <span>global edge regions</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="pulse-card">
+          <div class="pulse-row">
+            <span class="dot dot-live"></span>
+            <span>Live sync</span>
+            <span class="pulse-ms">4ms</span>
+          </div>
+          <div class="pulse-bars">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Logos -->
+    <section class="logos" aria-label="Built for teams shipping fast products">
+      <div class="container">
+        <p class="logos-label">Built for teams who can't afford to make people wait</p>
+        <div class="logos-row">
+          <span>Realtime APIs</span>
+          <span>Live Dashboards</span>
+          <span>Multiplayer Apps</span>
+          <span>Trading &amp; Fintech</span>
+          <span>Gaming</span>
+          <span>IoT &amp; Devices</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="features">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Features</span>
+          <h2>Everything you need to feel instant</h2>
+          <p>A complete toolkit for building products that respond the moment your users act.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Sub-10ms sync</h3>
+            <p>Push and receive updates across every connected client in single-digit milliseconds, globally.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">🌍</div>
+            <h3>Global edge network</h3>
+            <p>30+ points of presence keep data close to your users, wherever in the world they are.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>End-to-end secure</h3>
+            <p>Encrypted in transit and at rest, with granular per-channel access control out of the box.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">🔌</div>
+            <h3>Drop-in SDKs</h3>
+            <p>Lightweight client libraries for JavaScript, iOS, Android, and server-side runtimes.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3>Scales automatically</h3>
+            <p>From your first 10 users to your first 10 million — no re-architecture required.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">🛠️</div>
+            <h3>Built-in observability</h3>
+            <p>Live dashboards and alerting so you know about a delay before your users do.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="how-it-works" class="how-it-works">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">How it works</span>
+          <h2>Three steps to zero delay</h2>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <span class="step-number">1</span>
+            <h3>Connect</h3>
+            <p>Install the SDK and connect your app to your nearest Nodelay edge region in minutes.</p>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <h3>Publish</h3>
+            <p>Send events and state changes from anywhere — client, server, or edge function.</p>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <h3>Sync instantly</h3>
+            <p>Every subscriber receives the update in real time, with automatic conflict resolution.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="pricing">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Pricing</span>
+          <h2>Simple, usage-based pricing</h2>
+          <p>Start free. Pay only for what you use as you grow.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <article class="price-card">
+            <h3>Starter</h3>
+            <p class="price">$0<span>/mo</span></p>
+            <p class="price-desc">For side projects and prototypes.</p>
+            <ul>
+              <li>10k events / month</li>
+              <li>1 project</li>
+              <li>Community support</li>
+            </ul>
+            <a href="#cta" class="btn btn-ghost btn-block">Get started</a>
+          </article>
+
+          <article class="price-card price-card-featured">
+            <span class="price-badge">Most popular</span>
+            <h3>Growth</h3>
+            <p class="price">$49<span>/mo</span></p>
+            <p class="price-desc">For products live in production.</p>
+            <ul>
+              <li>5M events / month</li>
+              <li>Unlimited projects</li>
+              <li>99.99% uptime SLA</li>
+              <li>Priority support</li>
+            </ul>
+            <a href="#cta" class="btn btn-primary btn-block">Start free trial</a>
+          </article>
+
+          <article class="price-card">
+            <h3>Enterprise</h3>
+            <p class="price">Custom</p>
+            <p class="price-desc">For teams with scale &amp; compliance needs.</p>
+            <ul>
+              <li>Unlimited events</li>
+              <li>Dedicated infrastructure</li>
+              <li>SSO &amp; audit logs</li>
+              <li>Dedicated support</li>
+            </ul>
+            <a href="#cta" class="btn btn-ghost btn-block">Contact sales</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="faq">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">FAQ</span>
+          <h2>Questions, answered</h2>
+        </div>
+
+        <div class="faq-list">
+          <details>
+            <summary>How is Nodelay different from a regular database?</summary>
+            <p>Nodelay sits alongside your existing database as a real-time sync layer, so you don't have to build your own websocket infrastructure or polling logic.</p>
+          </details>
+          <details>
+            <summary>Can I self-host Nodelay?</summary>
+            <p>Enterprise plans support dedicated and self-hosted deployments. Contact sales to discuss your requirements.</p>
+          </details>
+          <details>
+            <summary>What happens if I go over my plan's event limit?</summary>
+            <p>You'll get a heads-up before you hit your limit, and can upgrade at any time — we never drop your traffic without warning.</p>
+          </details>
+          <details>
+            <summary>Do you offer a free trial on paid plans?</summary>
+            <p>Yes — every paid plan starts with a 14-day free trial, no credit card required to begin.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="cta" class="cta">
+      <div class="container cta-inner">
+        <h2>Stop making your users wait.</h2>
+        <p>Get started with Nodelay in minutes — free up to 10,000 events a month.</p>
+        <form class="cta-form" id="ctaForm">
+          <input type="email" id="ctaEmail" placeholder="you@company.com" aria-label="Email address" required />
+          <button type="submit" class="btn btn-primary">Create free account</button>
+        </form>
+        <p class="hero-note" id="ctaNote">No credit card required</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="#top" class="logo">
+          <span class="logo-mark">⚡</span>
+          <span>Nodelay</span>
+        </a>
+        <p>Real-time infrastructure for products that can't wait.</p>
+      </div>
+
+      <div class="footer-links">
+        <div>
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Blog</a>
+          <a href="#">Careers</a>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>© <span id="year"></span> Nodelay. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
