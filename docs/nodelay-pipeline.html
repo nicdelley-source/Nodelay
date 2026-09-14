@@ -1,0 +1,737 @@
+<title>NoDelay Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAF8F4;
+    --surface:#FFFFFF;
+    --surface-alt:#F1EEE7;
+    --ink:#232A28;
+    --ink-soft:#5C6560;
+    --ink-faint:#8B948E;
+    --line:rgba(20,30,26,0.13);
+    --accent:#1F9E75;
+    --accent-deep:#0B4536;
+    --accent-mint:#3FC79A;
+    --code-bg:#101915;
+    --code-ink:#D9F5EA;
+    --code-accent:#5FF0C0;
+    --danger:#B4482E;
+    --f-display:'Space Grotesk',sans-serif;
+    --f-body:'Source Serif 4',Georgia,serif;
+    --f-mono:'JetBrains Mono','SF Mono',monospace;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(11,69,54,0.04), 0 8px 24px rgba(11,69,54,0.06);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B1210;
+      --surface:#121B17;
+      --surface-alt:#17221D;
+      --ink:#EAF3EE;
+      --ink-soft:#9FB0A8;
+      --ink-faint:#68766F;
+      --line:rgba(234,243,238,0.14);
+      --accent:#4FD8A8;
+      --accent-deep:#7EE8C4;
+      --accent-mint:#5FF0C0;
+      --danger:#E38668;
+      --shadow:0 1px 2px rgba(0,0,0,0.2), 0 8px 28px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B1210;
+    --surface:#121B17;
+    --surface-alt:#17221D;
+    --ink:#EAF3EE;
+    --ink-soft:#9FB0A8;
+    --ink-faint:#68766F;
+    --line:rgba(234,243,238,0.14);
+    --accent:#4FD8A8;
+    --accent-deep:#7EE8C4;
+    --accent-mint:#5FF0C0;
+    --danger:#E38668;
+    --shadow:0 1px 2px rgba(0,0,0,0.2), 0 8px 28px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--f-body);
+    line-height:1.65;
+    font-size:16px;
+  }
+  img{max-width:100%;}
+  h1,h2,h3,h4{
+    font-family:var(--f-display);
+    color:var(--ink);
+    line-height:1.15;
+    text-wrap:balance;
+    margin:0;
+  }
+  p{margin:0;}
+  a{color:var(--accent);}
+  code,.mono{font-family:var(--f-mono);}
+  ::selection{background:var(--accent);color:var(--surface);}
+
+  .skip-link{position:absolute;left:-9999px;top:0;background:var(--accent);color:#fff;padding:10px 16px;border-radius:8px;z-index:200;}
+  .skip-link:focus{left:16px;top:16px;}
+
+  /* ---------- Shell ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns:260px minmax(0,1fr);
+    max-width:1180px;
+    margin:0 auto;
+  }
+  @media (max-width:960px){
+    .shell{grid-template-columns:1fr;}
+  }
+
+  /* ---------- Sidebar ---------- */
+  .rail{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    padding:36px 20px 36px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+    border-right:1px solid var(--line);
+  }
+  @media (max-width:960px){
+    .rail{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);padding:20px 20px 16px;}
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--f-display);
+    font-weight:700;
+    font-size:1.02rem;
+    color:var(--ink);
+  }
+  .brand-mark{
+    width:28px;height:28px;border-radius:8px;
+    background:linear-gradient(135deg,var(--accent-mint) 0%, var(--accent) 55%, var(--accent-deep) 100%);
+    flex:none;
+  }
+
+  .railnav{display:flex;flex-direction:column;gap:2px;}
+  .railnav a{
+    font-family:var(--f-display);
+    font-size:0.86rem;
+    font-weight:500;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:8px 10px;
+    border-radius:8px;
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+  }
+  .railnav a:hover{color:var(--ink);background:var(--surface-alt);}
+  .railnav a.active{color:var(--accent-deep);background:var(--surface-alt);}
+  .railnav .n{font-family:var(--f-mono);font-size:0.72rem;color:var(--ink-faint);min-width:1.4em;}
+
+  .rail-foot{
+    margin-top:auto;
+    font-size:0.78rem;
+    color:var(--ink-faint);
+    padding-top:16px;
+    border-top:1px solid var(--line);
+  }
+
+  @media (max-width:960px){
+    .railnav{
+      flex-direction:row;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .railnav a{padding:6px 10px;background:var(--surface-alt);}
+    .rail-foot{display:none;}
+  }
+
+  /* ---------- Main ---------- */
+  main{padding:56px clamp(20px,4vw,56px) 96px;min-width:0;}
+  .lede{max-width:640px;margin-bottom:56px;}
+  .eyebrow{
+    font-family:var(--f-mono);
+    font-size:0.78rem;
+    letter-spacing:0.06em;
+    color:var(--accent);
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:14px;
+  }
+  .lede h1{font-size:clamp(2rem,4vw,2.7rem);margin-bottom:16px;}
+  .lede p{color:var(--ink-soft);font-size:1.08rem;max-width:60ch;}
+
+  section{margin-bottom:76px;scroll-margin-top:32px;}
+  section > h2{
+    font-size:1.5rem;
+    margin-bottom:8px;
+  }
+  .section-intro{color:var(--ink-soft);max-width:62ch;margin-bottom:28px;font-size:0.98rem;}
+
+  /* ---------- System map ---------- */
+  .map{
+    display:flex;
+    align-items:stretch;
+    gap:0;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:28px 20px;
+    overflow-x:auto;
+  }
+  .map-step{
+    flex:1 1 0;
+    min-width:150px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:0 18px;
+  }
+  .map-step h3{font-size:0.98rem;}
+  .map-step p{font-size:0.86rem;color:var(--ink-soft);}
+  .map-icon{
+    width:38px;height:38px;
+    border-radius:10px;
+    display:grid;place-items:center;
+    background:var(--surface-alt);
+    color:var(--accent-deep);
+  }
+  .map-arrow{
+    flex:none;
+    width:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--ink-faint);
+  }
+  @media (max-width:760px){
+    .map{flex-direction:column;padding:20px;}
+    .map-step{padding:14px 0;}
+    .map-arrow{transform:rotate(90deg);width:auto;height:28px;}
+  }
+
+  /* ---------- Checklists ---------- */
+  .steps{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line);}
+  .step{
+    display:grid;
+    grid-template-columns:56px minmax(0,1fr);
+    gap:20px;
+    padding:26px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .step-num{
+    font-family:var(--f-mono);
+    font-size:0.92rem;
+    color:var(--ink-faint);
+    padding-top:2px;
+  }
+  .step h4{font-size:1.05rem;margin-bottom:6px;}
+  .step p{color:var(--ink-soft);font-size:0.96rem;max-width:64ch;}
+  .step p + p{margin-top:8px;}
+  .step label.check{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    cursor:pointer;
+  }
+  .step label.check input{
+    appearance:none;
+    width:19px;height:19px;
+    flex:none;
+    margin-top:3px;
+    border:1.6px solid var(--ink-faint);
+    border-radius:5px;
+    display:grid;place-items:center;
+    background:var(--surface);
+    cursor:pointer;
+  }
+  .step label.check input:checked{
+    background:var(--accent);
+    border-color:var(--accent);
+  }
+  .step label.check input:checked::after{
+    content:"";
+    width:5px;height:9px;
+    border:solid var(--surface);
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg) translate(-1px,-1px);
+  }
+  .step label.check input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .step-body{display:flex;flex-direction:column;gap:10px;}
+
+  .reset-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:14px;
+  }
+  .reset-btn{
+    font-family:var(--f-mono);
+    font-size:0.78rem;
+    color:var(--ink-faint);
+    background:none;
+    border:1px solid var(--line);
+    border-radius:100px;
+    padding:6px 14px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{color:var(--ink);border-color:var(--ink-faint);}
+
+  /* ---------- Code blocks ---------- */
+  pre{
+    background:var(--code-bg);
+    color:var(--code-ink);
+    border-radius:10px;
+    padding:16px 18px;
+    overflow-x:auto;
+    font-family:var(--f-mono);
+    font-size:0.85rem;
+    line-height:1.6;
+    margin:0;
+  }
+  pre .prompt{color:var(--code-accent);}
+  pre .comment{color:#8AA69B;}
+
+  /* ---------- Tip cards ---------- */
+  .tips{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .tip{
+    background:var(--surface);
+    padding:24px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .tip h4{font-size:0.98rem;}
+  .tip p{font-size:0.9rem;color:var(--ink-soft);}
+  .tip .tag{
+    font-family:var(--f-mono);
+    font-size:0.7rem;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+
+  /* ---------- Reference ---------- */
+  .ref-grid{display:flex;flex-direction:column;gap:18px;}
+  .ref-item{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:8px;
+  }
+  .ref-item h4{font-size:0.92rem;font-weight:600;color:var(--ink-soft);font-family:var(--f-body);font-style:italic;}
+
+  .callout{
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    border-radius:0 10px 10px 0;
+    padding:16px 20px;
+    font-size:0.94rem;
+    color:var(--ink-soft);
+    max-width:64ch;
+  }
+  .callout strong{color:var(--ink);}
+
+  footer{
+    padding:32px clamp(20px,4vw,56px) 64px;
+    color:var(--ink-faint);
+    font-size:0.82rem;
+    max-width:640px;
+  }
+</style>
+
+<a class="skip-link" href="#uebersicht">Zum Inhalt springen</a>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span>NoDelay Pipeline</div>
+    <nav class="railnav" aria-label="Abschnitte">
+      <a href="#uebersicht"><span class="n">00</span>Überblick</a>
+      <a href="#einrichtung"><span class="n">01</span>Einmalige Einrichtung</a>
+      <a href="#neuer-kunde"><span class="n">02</span>Neuer Kunde</a>
+      <a href="#update"><span class="n">03</span>Änderung liefern</a>
+      <a href="#praxis"><span class="n">04</span>Praxis &amp; Regeln</a>
+      <a href="#referenz"><span class="n">05</span>Kurzreferenz</a>
+    </nav>
+    <div class="rail-foot">Internes Playbook — NoDelay Webdesign, Nic Delley</div>
+  </aside>
+
+  <main>
+    <div class="lede">
+      <span class="eyebrow">Betriebshandbuch</span>
+      <h1>Von der Vorlage zur Live-Site — immer gleich, immer nachvollziehbar.</h1>
+      <p>Ein Repo pro Kunde, GitHub als Quelle der Wahrheit, Netlify baut und deployt automatisch. Diese Seite ist der feste Ablauf für jedes neue Projekt und für jede spätere Änderung — zum Abhaken, jedes Mal.</p>
+    </div>
+
+    <section id="uebersicht">
+      <h2>Das System auf einen Blick</h2>
+      <p class="section-intro">Vier Stationen, ein Weg. Code lebt nie nur auf einem Rechner — jede Version ist in GitHub gesichert, jede Änderung geht automatisch live.</p>
+
+      <div class="map">
+        <div class="map-step">
+          <div class="map-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/></svg>
+          </div>
+          <h3>Vorlage</h3>
+          <p>Ein geprüftes Startprojekt (z.&nbsp;B. <span class="mono">nodelay-webdesign</span>) mit Struktur, Formular-Anbindung und Design-Bausteinen.</p>
+        </div>
+        <div class="map-arrow" aria-hidden="true">
+          <svg width="20" height="12" viewBox="0 0 20 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 6h16M13 1l5 5-5 5"/></svg>
+        </div>
+        <div class="map-step">
+          <div class="map-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="6" r="2.4"/><path d="M6 8.4V15.6M8.4 6H15.6a2.4 2.4 0 0 1 2.4 2.4V6"/></svg>
+          </div>
+          <h3>Kunden-Repo</h3>
+          <p>Eigenes GitHub-Repository pro Kunde. Jeder Commit ist eine gesicherte Version — das Repo ist gleichzeitig das Backup.</p>
+        </div>
+        <div class="map-arrow" aria-hidden="true">
+          <svg width="20" height="12" viewBox="0 0 20 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 6h16M13 1l5 5-5 5"/></svg>
+        </div>
+        <div class="map-step">
+          <div class="map-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 18a4.5 4.5 0 0 1-.4-9A6 6 0 0 1 18 8a4 4 0 0 1-1 8H7Z"/></svg>
+          </div>
+          <h3>Netlify-Projekt</h3>
+          <p>Mit dem Repo verbunden. Jeder Push löst automatisch <span class="mono">npm run build</span> aus und veröffentlicht das Ergebnis.</p>
+        </div>
+        <div class="map-arrow" aria-hidden="true">
+          <svg width="20" height="12" viewBox="0 0 20 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 6h16M13 1l5 5-5 5"/></svg>
+        </div>
+        <div class="map-step">
+          <div class="map-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.2-3.6-8.5S9.6 5.8 12 3.5Z"/></svg>
+          </div>
+          <h3>Live-Domain</h3>
+          <p>Kunden-Domain zeigt auf Netlify, SSL wird automatisch ausgestellt. Für den Kunden sieht man von alldem nichts.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="einrichtung">
+      <h2>01 · Einmalige Einrichtung</h2>
+      <p class="section-intro">Nur beim allerersten Mal nötig — danach nie wieder.</p>
+      <div class="tips">
+        <div class="tip">
+          <span class="tag">Konten</span>
+          <h4>GitHub &amp; Netlify</h4>
+          <p>Ein GitHub-Konto für alle Kunden-Repos, ein Netlify-Konto (kostenloser Free-Plan reicht für die meisten Kundenprojekte).</p>
+        </div>
+        <div class="tip">
+          <span class="tag">Vorlage</span>
+          <h4>Startprojekt festlegen</h4>
+          <p>Ein bestehendes Projekt (z.&nbsp;B. <span class="mono">nodelay-webdesign</span>) als Vorlagen-Repository markieren — GitHub → Settings → „Template repository“.</p>
+        </div>
+        <div class="tip">
+          <span class="tag">Werkzeuge</span>
+          <h4>Lokal installiert</h4>
+          <p>Node.js (für <span class="mono">npm</span>) und Git müssen lokal installiert sein, um Projekte zu testen, bevor sie live gehen.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="neuer-kunde">
+      <h2>02 · Neuer Kunde — Website aufsetzen</h2>
+      <p class="section-intro">Der Ablauf für jedes neue Kundenprojekt, von der Vorlage bis zur Übergabe.</p>
+
+      <div class="steps" id="checklist-new">
+        <div class="step" data-id="new-1">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Vorlage duplizieren</h4></label>
+            <p>Neues Repo aus der Vorlage erstellen (GitHub: „Use this template“) oder klonen und den Git-Verlauf zurücksetzen. Name nach Schema <span class="mono">kunde-&lt;firma&gt;</span>.</p>
+            <pre><span class="comment"># Alternative ohne Template-Funktion:</span>
+git clone https://github.com/nicdelley-source/nodelay-webdesign.git kunde-mustercafe
+cd kunde-mustercafe
+rm -rf .git &amp;&amp; git init</pre>
+          </div>
+        </div>
+
+        <div class="step" data-id="new-2">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Inhalte anpassen</h4></label>
+            <p>Kundendaten in <span class="mono">src/lib/data.js</span> ersetzen (Leistungen, Preise, Portfolio, Kontakt). Farben und Fonts in <span class="mono">src/index.css</span>, Logo in <span class="mono">src/components/Logo.jsx</span>.</p>
+          </div>
+        </div>
+
+        <div class="step" data-id="new-3">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Lokal testen</h4></label>
+            <p>Vor dem ersten Push immer im Browser prüfen — Mobile-Ansicht und Kontaktformular nicht vergessen.</p>
+            <pre>npm install
+npm run dev
+<span class="comment"># → http://localhost:5173</span></pre>
+          </div>
+        </div>
+
+        <div class="step" data-id="new-4">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Auf GitHub pushen</h4></label>
+            <p>Neues, leeres Repository auf GitHub anlegen, dann verbinden und den ersten Stand hochladen.</p>
+            <pre>git remote add origin https://github.com/nicdelley-source/kunde-mustercafe.git
+git add -A &amp;&amp; git commit -m "Erste Version"
+git push -u origin main</pre>
+          </div>
+        </div>
+
+        <div class="step" data-id="new-5">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Netlify-Site verbinden</h4></label>
+            <p><span class="mono">Add new site → Import an existing project → GitHub</span> → Repo auswählen. Build command <span class="mono">npm run build</span>, Publish directory <span class="mono">dist</span>.</p>
+          </div>
+        </div>
+
+        <div class="step" data-id="new-6">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Domain verbinden</h4></label>
+            <p>Unter <span class="mono">Domain settings</span> die Kunden-Domain hinzufügen und die DNS-Einträge beim Registrar des Kunden setzen. Netlify stellt das SSL-Zertifikat automatisch aus — meist innerhalb weniger Minuten.</p>
+          </div>
+        </div>
+
+        <div class="step" data-id="new-7">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Kontaktformular prüfen</h4></label>
+            <p>Die Ziel-E-Mail-Adresse im Formular auf die des Kunden anpassen. Bei <span class="mono">formsubmit.co</span> bestätigt der Kunde die erste eingehende Mail selbst — oder direkt auf Netlify Forms umstellen (siehe Praxis-Tipps).</p>
+          </div>
+        </div>
+
+        <div class="step" data-id="new-8">
+          <div class="step-num">08</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Übergabe</h4></label>
+            <p>Kurze schriftliche Zusammenfassung an den Kunden: Live-URL, wie Änderungswünsche gemeldet werden, und ob er als Mitwirkender auf GitHub eingeladen werden möchte.</p>
+          </div>
+        </div>
+      </div>
+      <div class="reset-row"><button class="reset-btn" data-reset="checklist-new">Fortschritt zurücksetzen</button></div>
+    </section>
+
+    <section id="update">
+      <h2>03 · Änderung für einen bestehenden Kunden liefern</h2>
+      <p class="section-intro">Der wiederkehrende Ablauf, sobald ein Kunde etwas geändert haben möchte.</p>
+
+      <div class="steps" id="checklist-update">
+        <div class="step" data-id="up-1">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Repo öffnen</h4></label>
+            <p>Falls nicht mehr lokal vorhanden: erneut klonen. Sonst den neuesten Stand holen.</p>
+            <pre>git clone https://github.com/nicdelley-source/kunde-mustercafe.git
+<span class="comment"># oder, falls schon vorhanden:</span>
+git pull</pre>
+          </div>
+        </div>
+
+        <div class="step" data-id="up-2">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Änderung machen &amp; lokal testen</h4></label>
+            <p><span class="mono">npm run dev</span> starten, Änderung umsetzen, im Browser gegenprüfen — besonders auf Mobile.</p>
+          </div>
+        </div>
+
+        <div class="step" data-id="up-3">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Commit &amp; Push</h4></label>
+            <p>Eine klare Commit-Nachricht erleichtert es später, eine bestimmte Änderung wiederzufinden.</p>
+            <pre>git add -A
+git commit -m "Preise aktualisiert"
+git push</pre>
+          </div>
+        </div>
+
+        <div class="step" data-id="up-4">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Netlify baut automatisch</h4></label>
+            <p>Kein manueller Schritt nötig. Im Netlify-Dashboard unter <span class="mono">Deploys</span> den Build-Log prüfen — dauert meist unter einer Minute.</p>
+          </div>
+        </div>
+
+        <div class="step" data-id="up-5">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <label class="check"><input type="checkbox"><h4>Live-Seite verifizieren</h4></label>
+            <p>Auf der echten Domain kontrollieren, nicht nur auf der Netlify-Vorschau-URL — manche Änderungen (z.&nbsp;B. an der Domain-Konfiguration) wirken sich nur dort aus.</p>
+          </div>
+        </div>
+      </div>
+      <div class="reset-row"><button class="reset-btn" data-reset="checklist-update">Fortschritt zurücksetzen</button></div>
+    </section>
+
+    <section id="praxis">
+      <h2>04 · Praxis &amp; Regeln</h2>
+      <p class="section-intro">Ein paar Entscheidungen, die sich bei mehreren Kunden gleichzeitig auszahlen.</p>
+
+      <div class="tips">
+        <div class="tip">
+          <span class="tag">Struktur</span>
+          <h4>Ein Repo pro Kunde</h4>
+          <p>Nie mehrere Kunden in einem gemeinsamen Repository. So bleibt jedes Projekt unabhängig, eine Änderung bei Kunde A kann Kunde B nie versehentlich betreffen — und ein Repo lässt sich sauber übergeben, falls ein Kunde die Seite später selbst verwaltet.</p>
+        </div>
+        <div class="tip">
+          <span class="tag">Namen</span>
+          <h4>Feste Konvention</h4>
+          <p>Repo: <span class="mono">kunde-&lt;firma&gt;</span>. Vorläufige Adresse vor eigener Domain: <span class="mono">&lt;firma&gt;.netlify.app</span> (in den Netlify-Einstellungen frei wählbar).</p>
+        </div>
+        <div class="tip">
+          <span class="tag">Formulare</span>
+          <h4>Netlify Forms statt Drittanbieter</h4>
+          <p>Da ohnehin auf Netlify gehostet wird: <span class="mono">netlify</span> als Formular-Attribut ergänzen. Eingebauter Spamschutz, keine fremde E-Mail-Adresse im Quellcode sichtbar, Einträge direkt im Dashboard.</p>
+        </div>
+        <div class="tip">
+          <span class="tag">Branches</span>
+          <h4>Vorschau vor „live“</h4>
+          <p>Für grössere Umbauten einen eigenen Branch erstellen. Netlify baut dafür automatisch eine eigene Vorschau-URL (Deploy Preview) — der Kunde kann freigeben, bevor es in <span class="mono">main</span> gemerged wird.</p>
+        </div>
+        <div class="tip">
+          <span class="tag">Sicherung</span>
+          <h4>Git ist das Backup</h4>
+          <p>Jeder Commit bleibt für immer abrufbar. Bei einem Fehler genügt <span class="mono">git log</span> und ein Zurückspringen auf den letzten guten Stand.</p>
+        </div>
+        <div class="tip">
+          <span class="tag">Übergabe</span>
+          <h4>Zugriff sauber trennen</h4>
+          <p>Kunde nur dann als GitHub-Collaborator einladen, wenn er selbst Änderungen machen will. Sonst reicht die Live-URL — der Code bleibt vollständig in eigener Verwaltung.</p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:24px;">
+        <strong>Faustregel:</strong> Wenn eine Änderung nur für einen Kunden gilt, gehört sie in dessen Repo — nie in die gemeinsame Vorlage. Verbesserungen, die für alle künftigen Projekte sinnvoll sind, wandern zurück in die Vorlage.
+      </div>
+    </section>
+
+    <section id="referenz">
+      <h2>05 · Kurzreferenz</h2>
+      <p class="section-intro">Die Befehle, die in fast jedem Ablauf oben vorkommen — zum Nachschlagen.</p>
+
+      <div class="ref-grid">
+        <div class="ref-item">
+          <h4>Projekt herunterladen &amp; einrichten</h4>
+          <pre>git clone &lt;repo-url&gt;
+cd &lt;projektordner&gt;
+npm install</pre>
+        </div>
+        <div class="ref-item">
+          <h4>Lokal ansehen</h4>
+          <pre>npm run dev      <span class="comment"># Entwicklung, mit Live-Reload</span>
+npm run build    <span class="comment"># Produktions-Build nach dist/</span>
+npm run preview  <span class="comment"># Produktions-Build lokal testen</span></pre>
+        </div>
+        <div class="ref-item">
+          <h4>Änderung sichern &amp; veröffentlichen</h4>
+          <pre>git status                 <span class="comment"># was hat sich geändert?</span>
+git add -A
+git commit -m "&lt;beschreibung&gt;"
+git push                   <span class="comment"># → Netlify baut automatisch</span></pre>
+        </div>
+        <div class="ref-item">
+          <h4>Neuesten Stand holen</h4>
+          <pre>git pull</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  Internes Betriebshandbuch für NoDelay Webdesign. Fortschritt der Checklisten wird nur lokal in diesem Browser gespeichert.
+</footer>
+
+<script>
+  (function () {
+    "use strict";
+
+    // Active section highlight in the rail nav.
+    var links = Array.prototype.slice.call(document.querySelectorAll(".railnav a"));
+    var sections = links
+      .map(function (a) { return document.querySelector(a.getAttribute("href")); })
+      .filter(Boolean);
+
+    function setActive() {
+      var y = window.scrollY + 120;
+      var current = sections[0];
+      sections.forEach(function (s) { if (s.offsetTop <= y) current = s; });
+      links.forEach(function (a, i) {
+        a.classList.toggle("active", sections[i] === current);
+      });
+    }
+    document.addEventListener("scroll", setActive, { passive: true });
+    setActive();
+
+    // Checklist persistence (per-browser only — no account, no server).
+    var STORAGE_KEY = "nodelay-pipeline-progress";
+
+    function loadProgress() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveProgress(progress) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      } catch (e) {
+        /* private browsing / storage blocked — ignore */
+      }
+    }
+
+    var progress = loadProgress();
+
+    document.querySelectorAll(".step[data-id]").forEach(function (step) {
+      var id = step.getAttribute("data-id");
+      var box = step.querySelector('input[type="checkbox"]');
+      if (!box) return;
+      box.id = "chk-" + id;
+      if (progress[id]) box.checked = true;
+      box.addEventListener("change", function () {
+        progress[id] = box.checked;
+        saveProgress(progress);
+      });
+    });
+
+    document.querySelectorAll("[data-reset]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var listId = btn.getAttribute("data-reset");
+        var list = document.getElementById(listId);
+        if (!list) return;
+        list.querySelectorAll(".step[data-id]").forEach(function (step) {
+          var id = step.getAttribute("data-id");
+          var box = step.querySelector('input[type="checkbox"]');
+          if (box) box.checked = false;
+          delete progress[id];
+        });
+        saveProgress(progress);
+      });
+    });
+  })();
+</script>

@@ -1,0 +1,382 @@
+<title>NoDelay Betriebssystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAF8F4;
+    --surface:#FFFFFF;
+    --surface-alt:#F1EEE7;
+    --ink:#232A28;
+    --ink-soft:#5C6560;
+    --ink-faint:#8B948E;
+    --line:rgba(20,30,26,0.13);
+    --accent:#1F9E75;
+    --accent-deep:#0B4536;
+    --accent-mint:#3FC79A;
+    --model-a:#1F9E75;
+    --model-b:#B6772E;
+    --code-bg:#101915;
+    --code-ink:#D9F5EA;
+    --code-accent:#5FF0C0;
+    --f-display:'Space Grotesk',sans-serif;
+    --f-body:'Source Serif 4',Georgia,serif;
+    --f-mono:'JetBrains Mono','SF Mono',monospace;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(11,69,54,0.04), 0 8px 24px rgba(11,69,54,0.06);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B1210; --surface:#121B17; --surface-alt:#17221D;
+      --ink:#EAF3EE; --ink-soft:#9FB0A8; --ink-faint:#68766F;
+      --line:rgba(234,243,238,0.14);
+      --accent:#4FD8A8; --accent-deep:#7EE8C4; --accent-mint:#5FF0C0;
+      --model-a:#4FD8A8; --model-b:#E3A76B;
+      --shadow:0 1px 2px rgba(0,0,0,0.2), 0 8px 28px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B1210; --surface:#121B17; --surface-alt:#17221D;
+    --ink:#EAF3EE; --ink-soft:#9FB0A8; --ink-faint:#68766F;
+    --line:rgba(234,243,238,0.14);
+    --accent:#4FD8A8; --accent-deep:#7EE8C4; --accent-mint:#5FF0C0;
+    --model-a:#4FD8A8; --model-b:#E3A76B;
+    --shadow:0 1px 2px rgba(0,0,0,0.2), 0 8px 28px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.65;font-size:16px;}
+  img{max-width:100%;}
+  h1,h2,h3,h4{font-family:var(--f-display);color:var(--ink);line-height:1.15;text-wrap:balance;margin:0;}
+  p{margin:0;}
+  a{color:var(--accent);}
+  code,.mono{font-family:var(--f-mono);}
+  ::selection{background:var(--accent);color:var(--surface);}
+
+  .skip-link{position:absolute;left:-9999px;top:0;background:var(--accent);color:#fff;padding:10px 16px;border-radius:8px;z-index:200;}
+  .skip-link:focus{left:16px;top:16px;}
+
+  .shell{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:1180px;margin:0 auto;}
+  @media (max-width:960px){.shell{grid-template-columns:1fr;}}
+
+  .rail{position:sticky;top:0;align-self:start;height:100vh;padding:36px 20px 36px 24px;display:flex;flex-direction:column;gap:28px;border-right:1px solid var(--line);}
+  @media (max-width:960px){.rail{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);padding:20px 20px 16px;}}
+
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;font-size:1.02rem;color:var(--ink);}
+  .brand-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent-mint) 0%, var(--accent) 55%, var(--accent-deep) 100%);flex:none;}
+
+  .railnav{display:flex;flex-direction:column;gap:2px;}
+  .railnav a{font-family:var(--f-display);font-size:0.86rem;font-weight:500;color:var(--ink-soft);text-decoration:none;padding:8px 10px;border-radius:8px;display:flex;align-items:baseline;gap:8px;}
+  .railnav a:hover{color:var(--ink);background:var(--surface-alt);}
+  .railnav a.active{color:var(--accent-deep);background:var(--surface-alt);}
+  .railnav .n{font-family:var(--f-mono);font-size:0.72rem;color:var(--ink-faint);min-width:1.4em;}
+
+  .rail-foot{margin-top:auto;font-size:0.78rem;color:var(--ink-faint);padding-top:16px;border-top:1px solid var(--line);}
+  .rail-foot a{color:var(--ink-soft);}
+
+  @media (max-width:960px){
+    .railnav{flex-direction:row;flex-wrap:wrap;gap:6px;}
+    .railnav a{padding:6px 10px;background:var(--surface-alt);}
+    .rail-foot{display:none;}
+  }
+
+  main{padding:56px clamp(20px,4vw,56px) 96px;min-width:0;}
+  .lede{max-width:660px;margin-bottom:56px;}
+  .eyebrow{font-family:var(--f-mono);font-size:0.78rem;letter-spacing:0.06em;color:var(--accent);text-transform:uppercase;display:block;margin-bottom:14px;}
+  .lede h1{font-size:clamp(2rem,4vw,2.6rem);margin-bottom:16px;}
+  .lede p{color:var(--ink-soft);font-size:1.08rem;max-width:62ch;}
+
+  section{margin-bottom:80px;scroll-margin-top:32px;}
+  section > h2{font-size:1.5rem;margin-bottom:8px;}
+  .section-intro{color:var(--ink-soft);max-width:64ch;margin-bottom:28px;font-size:0.98rem;}
+
+  /* ---------- Journey timeline ---------- */
+  .journey{position:relative;padding-left:34px;}
+  .journey::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:var(--line);}
+  .jstop{position:relative;padding-bottom:36px;}
+  .jstop:last-child{padding-bottom:0;}
+  .jstop::before{
+    content:"";position:absolute;left:-34px;top:3px;width:18px;height:18px;border-radius:50%;
+    background:var(--surface);border:2.5px solid var(--accent);
+  }
+  .jstop h3{font-size:1.05rem;margin-bottom:6px;}
+  .jstop p{color:var(--ink-soft);font-size:0.95rem;max-width:64ch;}
+  .jstop .jtag{font-family:var(--f-mono);font-size:0.72rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:4px;}
+
+  /* ---------- Prompt example ---------- */
+  .prompt-example{
+    background:var(--code-bg);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    margin-top:16px;
+    max-width:70ch;
+  }
+  .prompt-example .who{font-family:var(--f-mono);font-size:0.72rem;color:var(--code-accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:10px;}
+  .prompt-example p{color:var(--code-ink);font-family:var(--f-mono);font-size:0.86rem;line-height:1.7;}
+
+  /* ---------- Tip cards (reused pattern) ---------- */
+  .tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .tip{background:var(--surface);padding:24px;display:flex;flex-direction:column;gap:8px;}
+  .tip h4{font-size:0.98rem;}
+  .tip p{font-size:0.9rem;color:var(--ink-soft);}
+  .tip .tag{font-family:var(--f-mono);font-size:0.7rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--accent);}
+
+  /* ---------- Model comparison ---------- */
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  @media (max-width:760px){.compare{grid-template-columns:1fr;}}
+  .model{background:var(--surface);padding:28px 26px;display:flex;flex-direction:column;gap:16px;}
+  .model-head{display:flex;align-items:center;gap:10px;}
+  .model-dot{width:10px;height:10px;border-radius:50%;flex:none;}
+  .model.a .model-dot{background:var(--model-a);}
+  .model.b .model-dot{background:var(--model-b);}
+  .model-head h3{font-size:1.1rem;}
+  .model-sub{font-size:0.85rem;color:var(--ink-faint);font-style:italic;font-family:var(--f-body);}
+  .model ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;}
+  .model li{font-size:0.9rem;color:var(--ink-soft);padding-left:18px;position:relative;}
+  .model.a li::before{content:"→";position:absolute;left:0;color:var(--model-a);}
+  .model.b li::before{content:"→";position:absolute;left:0;color:var(--model-b);}
+  .model-for{
+    margin-top:auto;padding-top:14px;border-top:1px solid var(--line);
+    font-size:0.86rem;color:var(--ink);
+  }
+  .model-for strong{display:block;font-family:var(--f-display);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-faint);margin-bottom:4px;font-weight:600;}
+
+  /* ---------- Pricing table ---------- */
+  .price-table{width:100%;border-collapse:collapse;font-size:0.94rem;}
+  .price-table th{
+    font-family:var(--f-display);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;
+    color:var(--ink-faint);text-align:left;padding:0 16px 12px;font-weight:600;
+  }
+  .price-table td{padding:16px;border-top:1px solid var(--line);vertical-align:top;}
+  .price-table tr td:first-child{font-family:var(--f-display);font-weight:600;color:var(--ink);}
+  .price-table .amount{font-family:var(--f-mono);color:var(--accent-deep);white-space:nowrap;}
+  :root[data-theme="dark"] .price-table .amount{color:var(--accent-mint);}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .price-table .amount{color:var(--accent-mint);}}
+  .price-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:8px 8px 4px;}
+
+  .callout{background:var(--surface-alt);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:16px 20px;font-size:0.94rem;color:var(--ink-soft);max-width:66ch;}
+  .callout strong{color:var(--ink);}
+  .callout.warn{border-left-color:var(--model-b);}
+
+  .linkout{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 24px;margin-top:20px;box-shadow:var(--shadow);
+  }
+  .linkout .txt{display:flex;flex-direction:column;gap:2px;}
+  .linkout .txt strong{font-family:var(--f-display);font-size:0.98rem;color:var(--ink);}
+  .linkout .txt span{font-size:0.86rem;color:var(--ink-soft);}
+  .linkout a.btn{
+    font-family:var(--f-mono);font-size:0.82rem;color:var(--surface);background:var(--accent-deep);
+    padding:10px 18px;border-radius:100px;text-decoration:none;white-space:nowrap;flex:none;
+  }
+  :root[data-theme="dark"] .linkout a.btn{color:var(--bg);background:var(--accent-mint);}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .linkout a.btn{color:var(--bg);background:var(--accent-mint);}}
+
+  footer{padding:32px clamp(20px,4vw,56px) 64px;color:var(--ink-faint);font-size:0.82rem;max-width:640px;}
+</style>
+
+<a class="skip-link" href="#reise">Zum Inhalt springen</a>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span>NoDelay Betriebssystem</div>
+    <nav class="railnav" aria-label="Abschnitte">
+      <a href="#reise"><span class="n">00</span>Die Reise</a>
+      <a href="#briefing"><span class="n">01</span>Erstgespräch</a>
+      <a href="#bauen"><span class="n">02</span>Bauen</a>
+      <a href="#freigabe"><span class="n">03</span>Freigabe</a>
+      <a href="#live"><span class="n">04</span>Live schalten</a>
+      <a href="#modelle"><span class="n">05</span>Zwei Modelle</a>
+      <a href="#preise"><span class="n">06</span>Preise</a>
+      <a href="#support"><span class="n">07</span>Laufender Support</a>
+    </nav>
+    <div class="rail-foot">Internes Playbook — NoDelay Webdesign, Nic Delley<br><a href="https://claude.ai/artifact/3XQSpjzwM4rkaUuTB4JK4a">→ Technisches Deploy-Playbook</a></div>
+  </aside>
+
+  <main>
+    <div class="lede">
+      <span class="eyebrow">Vom ersten Kontakt zur laufenden Rechnung</span>
+      <h1>Ein Ablauf, den du bei jedem Kunden genau gleich fährst.</h1>
+      <p>Sieben Stationen von der ersten Nachricht bis zur laufenden Betreuung — plus die eine Entscheidung, die pro Kunde alles Weitere bestimmt: Übergibst du die Seite vollständig, oder betreust du sie weiter gegen eine feste Gebühr?</p>
+    </div>
+
+    <section id="reise">
+      <h2>Die Reise eines Projekts</h2>
+      <p class="section-intro">Sieben Stationen, immer in dieser Reihenfolge. Die Details zu jeder Station folgen weiter unten.</p>
+
+      <div class="journey">
+        <div class="jstop"><span class="jtag">01</span><h3>Erstgespräch &amp; Briefing</h3><p>Kunde meldet sich — du sammelst alles, was du zum Bauen brauchst.</p></div>
+        <div class="jstop"><span class="jtag">02</span><h3>Bauen</h3><p>Mit Claude die Website aus deiner Vorlage aufsetzen und mit den Kundeninhalten füllen.</p></div>
+        <div class="jstop"><span class="jtag">03</span><h3>Freigabe</h3><p>Vorschau-Link an den Kunden, Feedback einholen, anpassen.</p></div>
+        <div class="jstop"><span class="jtag">04</span><h3>Live schalten</h3><p>GitHub → Netlify → eigene Domain. Der technische Teil, den das Deploy-Playbook Schritt für Schritt zeigt.</p></div>
+        <div class="jstop"><span class="jtag">05</span><h3>Die Entscheidung</h3><p>Modell A (Kunde übernimmt) oder Modell B (du hostest weiter)? Wird meist schon im Erstgespräch besprochen.</p></div>
+        <div class="jstop"><span class="jtag">06</span><h3>Abrechnung</h3><p>Schlussrechnung stellen, bei Modell B zusätzlich die erste Hosting-Rechnung ankündigen.</p></div>
+        <div class="jstop"><span class="jtag">07</span><h3>Laufender Support</h3><p>Änderungswünsche kommen rein, du lieferst sie über denselben Ablauf wie beim Bauen.</p></div>
+      </div>
+    </section>
+
+    <section id="briefing">
+      <h2>01 · Erstgespräch &amp; Briefing</h2>
+      <p class="section-intro">Je vollständiger diese Liste beim Start ist, desto weniger Rückfragen während des Bauens.</p>
+
+      <div class="tips">
+        <div class="tip"><span class="tag">Pflicht</span><h4>Firmenname &amp; Branche</h4><p>Was macht das Unternehmen, wer ist die Zielgruppe.</p></div>
+        <div class="tip"><span class="tag">Pflicht</span><h4>Inhalte</h4><p>Texte (oder Stichworte, aus denen du Text machst), Öffnungszeiten, Preise, Kontaktdaten.</p></div>
+        <div class="tip"><span class="tag">Pflicht</span><h4>Bilder &amp; Logo</h4><p>Eigene Fotos sind immer besser als generische. Falls keine vorhanden: siehe Hinweis unten.</p></div>
+        <div class="tip"><span class="tag">Wichtig</span><h4>Wunsch-Optik</h4><p>Ein bis zwei Websites, die dem Kunden gefallen — als Referenz, nicht zum Kopieren.</p></div>
+        <div class="tip"><span class="tag">Wichtig</span><h4>Paket</h4><p>Landingpage, Website oder Online-Shop? Legt Preis und Aufwand fest (siehe Preise unten).</p></div>
+        <div class="tip"><span class="tag">Entscheidung</span><h4>Modell A oder B?</h4><p>Übernimmt der Kunde die Seite selbst, oder hostest du sie weiter? Siehe Abschnitt 05 — am besten schon hier ansprechen.</p></div>
+      </div>
+
+      <div class="callout" style="margin-top:20px;">
+        <strong>Keine eigenen Bilder vorhanden?</strong> Ein KI-Bildtool (z.&nbsp;B. Higgsfield) liefert schnell brauchbare Platzhalter- oder Stimmungsbilder. Für die finale Seite sind echte Fotos vom Betrieb trotzdem fast immer überzeugender — beim Kunden nachfragen, bevor man sich auf generierte Bilder verlässt.
+      </div>
+    </section>
+
+    <section id="bauen">
+      <h2>02 · Bauen — mit Claude</h2>
+      <p class="section-intro">Du beschreibst in normalen Sätzen, was der Kunde möchte. Claude setzt es in der Vorlage um.</p>
+
+      <div class="journey" style="padding-left:0;margin-bottom:8px;">
+        <div class="jstop" style="padding-bottom:0;">
+          <p style="color:var(--ink-soft);font-size:0.96rem;max-width:66ch;">Am einfachsten: alle gesammelten Infos aus dem Briefing in einer Nachricht an Claude schicken. Fotos und Logo einfach mitschicken oder hochladen — Claude liest sie direkt mit.</p>
+        </div>
+      </div>
+
+      <div class="prompt-example">
+        <span class="who">Beispiel-Nachricht an Claude</span>
+        <p>„Neuer Kunde: Bäckerei ‚Zopf &amp; Co‘ in Winterthur. Ausgangspunkt ist unsere nodelay-webdesign-Vorlage. Sie möchte eine einfache Landingpage mit Öffnungszeiten, drei Produktbildern (hänge ich an) und einem Kontaktformular an info@zopfundco.ch. Farben: warmes Braun/Beige statt unserem Grün. Bitte als eigenes Projekt aufsetzen.“</p>
+      </div>
+
+      <div class="callout" style="margin-top:20px;">
+        Ergebnis nach diesem Schritt: ein lokal lauffähiges Projekt, das du dir im Browser ansehen kannst — noch nicht live, nur bei dir.
+      </div>
+    </section>
+
+    <section id="freigabe">
+      <h2>03 · Freigabe einholen</h2>
+      <p class="section-intro">Bevor irgendetwas live geht: Der Kunde sieht das Ergebnis und bestätigt es.</p>
+
+      <div class="journey">
+        <div class="jstop"><span class="jtag">Vorschau zeigen</span><h3>Screenshots oder Vorschau-Link</h3><p>Claude kann dir Screenshots erzeugen, oder du teilst kurz per Bildschirmfreigabe. Für grössere Projekte: Netlify erstellt automatisch eine Vorschau-URL, sobald ein Entwurfs-Branch existiert (siehe Deploy-Playbook, Abschnitt „Branches &amp; Vorschau“).</p></div>
+        <div class="jstop"><span class="jtag">Feedback sammeln</span><h3>Eine Runde, klar gebündelt</h3><p>Am besten alle Änderungswünsche des Kunden in einer Nachricht sammeln lassen, statt einzeln nachzufragen — spart Runden.</p></div>
+        <div class="jstop"><span class="jtag">Anpassen</span><h3>Zurück zu Claude</h3><p>Die gesammelten Wünsche einfach weitergeben: „Kunde möchte X grösser, Y in Blau, Abschnitt Z weg.“</p></div>
+      </div>
+    </section>
+
+    <section id="live">
+      <h2>04 · Live schalten</h2>
+      <p class="section-intro">Der technische Teil ist bereits als eigener, abhakbarer Ablauf dokumentiert — hier nur die Kurzfassung.</p>
+
+      <div class="tips">
+        <div class="tip"><span class="tag">1</span><h4>GitHub</h4><p>Projekt in ein eigenes Repository pushen — das ist gleichzeitig die Sicherung.</p></div>
+        <div class="tip"><span class="tag">2</span><h4>Netlify</h4><p>Repository verbinden, Netlify baut und veröffentlicht automatisch bei jeder Änderung.</p></div>
+        <div class="tip"><span class="tag">3</span><h4>Domain</h4><p>Kunden-Domain verbinden, SSL wird automatisch ausgestellt.</p></div>
+      </div>
+
+      <div class="linkout">
+        <div class="txt"><strong>NoDelay Pipeline</strong><span>Die vollständige, abhakbare Schritt-für-Schritt-Anleitung mit allen Befehlen.</span></div>
+        <a class="btn" href="https://claude.ai/artifact/3XQSpjzwM4rkaUuTB4JK4a">Playbook öffnen →</a>
+      </div>
+    </section>
+
+    <section id="modelle">
+      <h2>05 · Die Entscheidung: Wer betreut die Seite danach?</h2>
+      <p class="section-intro">Eine Weiche pro Kunde. Grob vergleichbar mit Kauf vs. Miete: Modell A übergibst du vollständig, Modell B bleibt laufend bei dir — mit laufender Einnahme.</p>
+
+      <div class="compare">
+        <div class="model a">
+          <div class="model-head"><span class="model-dot"></span><h3>Modell A — Übergabe</h3></div>
+          <p class="model-sub">Wie ein Kauf: einmal bezahlt, dann gehört sie dem Kunden.</p>
+          <ul>
+            <li>GitHub-Repository wird auf den Kunden übertragen (oder er lädt es als eigenes Konto ein)</li>
+            <li>Kunde erstellt eigenes Netlify-Konto, du verbindest es einmalig oder übergibst die Site</li>
+            <li>Domain läuft auf den Namen des Kunden, er zahlt die Registrierung selbst</li>
+            <li>Einmalzahlung nach Paket, keine laufenden Kosten oder Einnahmen für dich</li>
+            <li>Künftige Änderungen: nur auf Anfrage, separat verrechnet</li>
+          </ul>
+          <div class="model-for"><strong>Passt gut für</strong>Kunden mit eigenem technischem Interesse oder festem Budget, die volle Kontrolle wollen.</div>
+        </div>
+        <div class="model b">
+          <div class="model-head"><span class="model-dot"></span><h3>Modell B — Rundum-Sorglos</h3></div>
+          <p class="model-sub">Wie eine Miete: läuft weiter, solange die Gebühr bezahlt wird.</p>
+          <ul>
+            <li>Repository und Netlify-Projekt bleiben in deiner Verwaltung</li>
+            <li>Domain bleibt beim Kunden registriert, DNS zeigt auf dein Netlify-Projekt</li>
+            <li>Feste monatliche oder jährliche Hosting-Pauschale (Betrag legst du fest, siehe Preise)</li>
+            <li>Kleinere Änderungen meist in der Pauschale inbegriffen — du definierst die Grenze</li>
+            <li>Laufende Einnahme, aber auch laufende Verantwortung: Seite muss erreichbar bleiben</li>
+          </ul>
+          <div class="model-for"><strong>Passt gut für</strong>Kunden ohne technisches Interesse, die „es soll einfach laufen“ wollen — meist die Mehrheit.</div>
+        </div>
+      </div>
+
+      <div class="callout warn" style="margin-top:20px;">
+        <strong>Wichtig bei Modell A:</strong> Übergabe erst nach vollständiger Zahlung. GitHub → Settings → „Transfer ownership“ überträgt das Repository sauber, inklusive gesamtem Verlauf.
+      </div>
+    </section>
+
+    <section id="preise">
+      <h2>06 · Preise &amp; Abrechnung</h2>
+      <p class="section-intro">Die drei Pakete sind bereits auf der Website festgelegt — hier als Übersicht, ergänzt um Anzahlung und Hosting.</p>
+
+      <div class="price-table-wrap">
+        <table class="price-table">
+          <tr><th>Paket</th><th>Preis</th><th>Enthält</th></tr>
+          <tr><td>Landingpage</td><td class="amount">CHF 700 +MWST</td><td>Einzelne Seite, mobiloptimiert, Google Analytics</td></tr>
+          <tr><td>Website</td><td class="amount">CHF 1'500 +MWST</td><td>Bis 6 Unterseiten, Kontaktformular, SEO-optimiert</td></tr>
+          <tr><td>Online-Shop</td><td class="amount">CHF 4'000 +MWST</td><td>Zahlungsabwicklung, Produktverwaltung, Versand</td></tr>
+          <tr><td>Hosting (Modell B)</td><td class="amount">z.&nbsp;B. CHF 20–40 / Monat</td><td>Betrag selbst festlegen — deckt Domain, Erreichbarkeit, kleine Anpassungen</td></tr>
+        </table>
+      </div>
+
+      <div class="tips" style="margin-top:24px;">
+        <div class="tip"><span class="tag">Anzahlung</span><h4>50 / 50</h4><p>Die Hälfte bei Auftragserteilung, die Hälfte bei Übergabe — üblich und schützt beide Seiten.</p></div>
+        <div class="tip"><span class="tag">Rechnung</span><h4>Nach Übergabe</h4><p>Schlussrechnung mit 14–30 Tagen Zahlungsfrist. Bei Modell B: erste Hosting-Rechnung gleich mit ankündigen.</p></div>
+        <div class="tip"><span class="tag">Änderungswünsche</span><h4>Stundensatz oder Pauschale</h4><p>Für Anfragen ausserhalb des vereinbarten Rahmens einen festen Stundensatz oder eine Pauschale pro kleiner Änderung definieren — und kommunizieren, bevor man loslegt.</p></div>
+      </div>
+
+      <div class="callout" style="margin-top:20px;">
+        <strong>Mehrwertsteuer:</strong> In der Schweiz muss man Umsatz erst ab einer bestimmten Jahresgrenze zwingend mit MWST abrechnen. Ob und wie das bei dir zutrifft, am besten einmal mit einem Treuhänder oder direkt bei der ESTV klären, statt sich auf eine Faustregel zu verlassen.
+      </div>
+    </section>
+
+    <section id="support">
+      <h2>07 · Laufender Support</h2>
+      <p class="section-intro">Egal ob Modell A oder B: Ein Änderungswunsch läuft immer gleich ab.</p>
+
+      <div class="journey">
+        <div class="jstop"><span class="jtag">Anfrage kommt rein</span><h3>Per Mail oder Telefon</h3><p>Kurz festhalten, was genau gewünscht ist — bei Modell A gleich klären, ob es separat verrechnet wird.</p></div>
+        <div class="jstop"><span class="jtag">Umsetzen</span><h3>Gleicher Ablauf wie beim Bauen</h3><p>Repo öffnen, Claude die Änderung beschreiben, lokal testen.</p></div>
+        <div class="jstop"><span class="jtag">Liefern</span><h3>Push → automatisch live</h3><p>Über GitHub, Netlify baut automatisch neu. Details im <a href="https://claude.ai/artifact/3XQSpjzwM4rkaUuTB4JK4a">Deploy-Playbook</a>, Abschnitt „Änderung liefern“.</p></div>
+        <div class="jstop"><span class="jtag">Abschliessen</span><h3>Kurz bestätigen</h3><p>Dem Kunden kurz Bescheid geben, dass die Änderung live ist — bei Aufwand ausserhalb der Pauschale gleich die Rechnung anhängen.</p></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  Internes Betriebshandbuch für NoDelay Webdesign. Ergänzt das technische <a href="https://claude.ai/artifact/3XQSpjzwM4rkaUuTB4JK4a">Deploy-Playbook</a> um Akquise, Bauprozess, Übergabe-Modelle und Preise.
+</footer>
+
+<script>
+  (function () {
+    "use strict";
+    var links = Array.prototype.slice.call(document.querySelectorAll(".railnav a"));
+    var sections = links
+      .map(function (a) { return document.querySelector(a.getAttribute("href")); })
+      .filter(Boolean);
+
+    function setActive() {
+      var y = window.scrollY + 120;
+      var current = sections[0];
+      sections.forEach(function (s) { if (s.offsetTop <= y) current = s; });
+      links.forEach(function (a, i) { a.classList.toggle("active", sections[i] === current); });
+    }
+    document.addEventListener("scroll", setActive, { passive: true });
+    setActive();
+  })();
+</script>
