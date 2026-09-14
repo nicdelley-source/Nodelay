@@ -642,6 +642,16 @@ section:nth-child(even) {
   min-height: 120px;
 }
 
+.form-legal {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-top: -8px;
+}
+
+.form-legal a {
+  color: var(--accent);
+}
+
 footer {
   background: var(--dark);
   color: #fff;

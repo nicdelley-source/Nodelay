@@ -1,0 +1,121 @@
+:root {
+  --bg: #FFFFFF;
+  --bg-alt: #F5F4F0;
+  --ink: #3C3F44;
+  --ink-soft: #75797D;
+  --accent: #1F9E75;
+  --dark: #0B4536;
+  --line: rgba(34, 37, 42, 0.12);
+  --f-head: 'Space Grotesk', sans-serif;
+  --f-body: 'Source Serif 4', Georgia, serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--f-body);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.65;
+}
+
+a { color: var(--accent); }
+
+.bar {
+  background: var(--dark);
+  color: #fff;
+}
+.bar .container {
+  width: min(760px, 92%);
+  margin: auto;
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+.bar a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-family: var(--f-head);
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.bar a:hover { color: #fff; }
+
+main {
+  width: min(760px, 92%);
+  margin: auto;
+  padding: 56px 0 96px;
+}
+
+.eyebrow {
+  font-family: var(--f-head);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 14px;
+}
+
+h1 {
+  font-family: var(--f-head);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.stand {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin-bottom: 48px;
+}
+
+h2 {
+  font-family: var(--f-head);
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 40px 0 14px;
+}
+
+h2:first-of-type { margin-top: 0; }
+
+p, li {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+strong { color: var(--ink); font-weight: 600; }
+
+ul { padding-left: 20px; }
+
+.card {
+  background: var(--bg-alt);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin: 8px 0 32px;
+}
+.card p:last-child { margin-bottom: 0; }
+
+.todo {
+  background: #FFF7E6;
+  border: 1.5px dashed #D9A441;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 8px 0 20px;
+}
+.todo p { color: #7A5A12; margin: 0; font-size: 0.92rem; }
+.todo strong { color: #7A5A12; }
+
+.disclaimer {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}

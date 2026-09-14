@@ -13,6 +13,8 @@ export default function Footer() {
                 {link.label}
               </a>
             ))}
+            <a href="/impressum.html">Impressum</a>
+            <a href="/datenschutz.html">Datenschutz</a>
           </div>
         </div>
         <div className="footer-bottom">

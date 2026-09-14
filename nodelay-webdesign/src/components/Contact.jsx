@@ -41,6 +41,9 @@ export default function Contact() {
           <button className="btn btn-solid" type="submit">
             Nachricht senden →
           </button>
+          <p className="form-legal">
+            Mit dem Absenden akzeptierst du unsere <a href="/datenschutz.html">Datenschutzerklärung</a>.
+          </p>
         </Reveal>
       </div>
     </section>

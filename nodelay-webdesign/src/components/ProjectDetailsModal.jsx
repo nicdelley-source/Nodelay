@@ -83,6 +83,9 @@ export default function ProjectDetailsModal({ open, onClose, planId }) {
         <button type="submit" className="btn btn-solid" style={{ width: "100%", justifyContent: "center" }}>
           Projekt einreichen →
         </button>
+        <p className="form-legal">
+          Mit dem Absenden akzeptierst du unsere <a href="/datenschutz.html">Datenschutzerklärung</a>.
+        </p>
       </form>
     </Modal>
   );
