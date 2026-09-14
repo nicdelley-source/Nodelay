@@ -2,3 +2,6 @@ node_modules
 dist
 .DS_Store
 *.local
+
+# Generierte Kundenprojekte — jedes bekommt sein eigenes GitHub-Repo
+kunden/
