@@ -4,18 +4,26 @@ A landing page for **Nodelay** — a real-time sync/infrastructure product conce
 
 ## Stack
 
-Plain HTML, CSS, and vanilla JavaScript — no build step, no dependencies. Open `index.html` directly in a browser, or serve the folder with any static file server.
+React + [Vite](https://vitejs.dev/), animated with [Framer Motion](https://www.framer.com/motion/).
 
 ```bash
-# example: serve locally
-npx serve .
+npm install       # install dependencies
+npm run dev       # start the dev server
+npm run build     # production build -> dist/
+npm run preview   # preview the production build
 ```
 
 ## Structure
 
-- `index.html` — page markup (hero, features, how it works, pricing, FAQ, CTA, footer)
-- `styles.css` — all styling, responsive down to ~360px
-- `script.js` — mobile nav toggle, footer year, and lightweight signup form handling (no backend wired up yet)
+- `index.html` — Vite entry HTML
+- `src/main.jsx` — React root
+- `src/App.jsx` — page composition
+- `src/components/` — one component per section (`Header`, `Hero`, `Logos`, `Features`, `HowItWorks`, `Pricing`, `FAQ`, `CTA`, `Footer`), plus `Reveal.jsx` (scroll-in-view fade/slide wrapper) and `SignupForm.jsx` (shared email capture form)
+- `src/index.css` — all styling, responsive down to ~360px
+
+## Animation
+
+Framer Motion drives: staggered hero entrance, scroll-triggered section reveals (`whileInView`), the animated live-sync bar chart, the mobile nav slide-open, and the FAQ accordion expand/collapse.
 
 ## Notes
 
