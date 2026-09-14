@@ -14,6 +14,27 @@
   --radius-sm: 10px;
   --container: 1180px;
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.45);
+
+  /* Spacing — 8px base grid (4px used only as a half-step) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 64px;
+  --space-8: 96px;
+
+  /* Typography — modular scale, Inter */
+  --text-xs: 0.75rem;   /* 12px — labels, meta */
+  --text-sm: 0.875rem;  /* 14px — nav, small UI text */
+  --text-base: 1rem;    /* 16px — body */
+  --text-lg: 1.125rem;  /* 18px — lead paragraphs */
+  --text-xl: 1.25rem;   /* 20px — card titles */
+  --text-2xl: 1.5rem;   /* 24px — section sub-headings */
+  --text-3xl: 1.875rem; /* 30px — stat numbers */
+  --text-4xl: clamp(1.8rem, 3vw, 2.4rem);   /* section headings (h2) */
+  --text-5xl: clamp(2.4rem, 5vw, 3.75rem);  /* hero heading (h1) */
 }
 
 * {
