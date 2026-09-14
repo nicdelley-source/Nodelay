@@ -102,6 +102,25 @@ Alles, was der Brief nicht hergibt, wird sichtbar markiert — nicht erfunden:
 Diese Marker sind absichtlich hässlich, damit sie niemandem entgehen. Am Ende alle
 auflisten (siehe Schritt 8).
 
+Damit sie auch auf der Seite selbst auffallen, eine kleine Komponente
+`src/components/Text.jsx` anlegen, die `[[ ... ]]` gelb hinterlegt rendert, und alle
+Datenfelder damit ausgeben:
+
+```jsx
+export default function Text({ children }) {
+  const teile = String(children ?? "").split(/(\[\[.*?\]\])/g);
+  return <>{teile.map((t, i) => t.startsWith("[[")
+    ? <span className="ph" key={i}>{t.replace(/^\[\[\s*|\s*\]\]$/g, "")}</span>
+    : t)}</>;
+}
+```
+
+Dazu in `src/index.css`:
+
+```css
+.ph { background:#FFF3D6; color:#7A5A12; border-bottom:1.5px dashed #D9A441; padding:0 4px; }
+```
+
 ### 7. Prüfen
 
 ```bash
